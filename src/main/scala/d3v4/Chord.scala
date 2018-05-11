@@ -28,7 +28,6 @@ trait Ribbon extends js.Object{
 trait ChordLayout extends js.Object{
   def padAngle(angle: Double): ChordLayout = js.native
   def sortSubgroups(comp: Comparator[Int]): ChordLayout = js.native
-
   def apply(m: js.Array[js.Array[Double]]): ChordArray = js.native
 }
 
