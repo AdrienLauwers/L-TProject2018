@@ -77,6 +77,9 @@ trait BaseDom[Datum, T <: BaseDom[Datum, T]] extends js.Object {
   def attr(name: String, value: Primitive): T = js.native
   def attr[R](name: String, value: DatumFunction[Primitive]): T = js.native
 
+  def property(name: String) : String = js.native
+  def property(name: String, value: Primitive): T = js.native
+
   def text(): String = js.native
   def text(value: String): T = js.native
   def text[R](value: ValueFunction0[R]): T = js.native
