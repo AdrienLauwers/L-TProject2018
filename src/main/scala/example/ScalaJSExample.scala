@@ -1,7 +1,8 @@
 package example
 
 import d3v4._
-import example.ScalaJSExample.MyChordGraph.test
+import example.ScalaJSExample.MyChordGraph.{generate, test}
+import example.ScalaJSExample.generate
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -54,9 +55,14 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
     trait Op
     case class colorOp(i: String) extends Op
-    case class dataOp(i: Seq[Double]) extends Op
+    case class lineOp(i: Seq[Double]) extends Op
+    case class columnOp(i: Seq[Double]) extends Op
     object color { def is (i : String) = colorOp(i) }
-    object data {def are (i : Double*) = {val tmp : Seq[Double] = i; dataOp(tmp)}}
+    object data {
+      def is (i : Double*) = {val tmp : Seq[Double] = i; lineOp(tmp)}
+      def from (i : Double*) = {val tmp : Seq[Double] = i; columnOp(tmp)}
+      def to (i : Double*) = {val tmp : Seq[Double] = i; lineOp(tmp)}
+    }
 
     class itemClass
     {
@@ -87,11 +93,21 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
       var matrix  : List[js.Array[Double]] = List()
       var colors :  List[String] = List()
       var test : String = ""
+
       def addElem(op: Op*) = {
         op.foreach( _ match {
-          case dataOp(i) => {
+          case lineOp(i) => {
             import js.JSConverters._
+
             matrix = matrix :+ i.toJSArray;
+            println("Après le line op")
+            println(matrix)
+          }
+          case columnOp(i) => {
+            for((x,j) <- matrix.view.zipWithIndex){ x.push(i(j)); println(j)}
+            println("Après le column op")
+            println(matrix)
+
           }
           case colorOp(i) => { colors = colors :+ i; println(colors)}
           case _ => println(op);
@@ -105,11 +121,13 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
         })
       }
 
-
       def generate()  = {
         import js.JSConverters._
         var colorJS : js.Array[String] = colors.toJSArray
         var matrixJS : js.Array[js.Array[Double]] = matrix.toJSArray
+        println("la matrice")
+        println(matrixJS(0))
+        println(matrixJS(1))
         import d3v4.d3
         val svg = d3.select("svg")
         val width = svg.attr("width").toDouble
@@ -148,32 +166,34 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
           .attr("d", (d: Chord) => ribbon(d))
           .style("fill", (d: Chord) => color(d.target.index))
           .style("stroke", (d: Chord) => d3.rgb(color(d.target.index)).darker())
-
       }
+
+
     }
 
 
     @JSExport
     def main(args: Array[String]): Unit = {
       create a chord ; // a remplacer par width
-      add elemTo chord having (data are (12,15,15), color is "#FFDD89");
-      add elemTo chord having (data are (10,5,55), color is "#957244");
-      add elemTo chord having (data are (12,45,65), color is "#F26223");
+      add elemTo chord having (data is (55), color is "#FFDD89");
+      add elemTo chord having (data from (25,15),data to (55,12), color is "#23A638");
+      add elemTo chord having (data from (43,12,15),data to (55,12,28), color is "#68bfac");
       generate the chord;
       select the item named "sizeButton" make resizeFunction
       select the item named "resetButton" make resetDataFunction
-      select the item named "addDataButton" make addDataFunction
+      select the item named "addDataButton" make {
+        () => add elemTo chord having (data from (1,15,24,34),data to (100,12,25,14), color is "#cbb076")};
     }
 
     def resizeFunction() = {
       d3.select("svg").attr("width", 100)
     }
 
-    def resizeFunction() = {
+    def resetDataFunction() = {
       d3.select("svg").attr("width", 100)
     }
 
-    def addDataButton() = {
+    def addDataFunction() = {
       d3.select("svg").attr("width", 100)
     }
 
