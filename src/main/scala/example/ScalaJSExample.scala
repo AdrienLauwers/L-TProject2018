@@ -1,17 +1,17 @@
 package example
 
 import d3v4._
-import example.ScalaJSExample.MyChordGraph.{generate, test}
+import example.ScalaJSExample.MyChordGraph.{generate}
 import example.ScalaJSExample.generate
 
+import scala.collection.mutable.ArrayBuffer
+import scala.reflect.ClassTag
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
   object ScalaJSExample {
     @JSExportTopLevel("myproject")
     protected def getInstance(): this.type = this
-
-
 
     def groupTicks(d: ChordGroup, step: Double): js.Array[js.Dictionary[Double]] = {
       val k: Double = (d.endAngle - d.startAngle) / d.value
@@ -57,6 +57,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
     case class colorOp(i: String) extends Op
     case class lineOp(i: Array[Double]) extends Op
     case class columnOp(i: Array[Double]) extends Op
+    case class widthOp(i: Double) extends Op
 
     object color {
       def is (i : String) = colorOp(i)
@@ -83,6 +84,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
         lineOp(tmp)
       }
     }
+    object  width { def is( i :Double) = widthOp(i)}
 
     class itemClass
     {
@@ -90,7 +92,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
     }
 
     class ChordGraph {
-      def where(op: Op*) = MyChordGraph(op:_*)
+      def where(op: Op) = MyChordGraph(op)
       def having(op: Op*) = MyChordGraph.addElem(op:_*)
     }
 
@@ -100,8 +102,6 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
     class Action(name : String) {
       def make(fnct: () => Unit) = {
-
-        //d3.select("#"+name).on("click", () => fnct)
         d3.scaleLinear()
         println(name)
         d3.select("#"+name).on("click", () => fnct())
@@ -109,67 +109,66 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
     }
 
     object MyChordGraph extends DO {
-
-      var matrix  : List[js.Array[Double]] = List()
-      var colors :  List[String] = List()
-      var test : String = ""
+      def resetData() = {
+       // matrix = List(List(50))
+       // colors = List("#FFDD89")
+        generate()
+      }
+      var matrix = new ArrayBuffer[ArrayBuffer[Double]]()
+      var colors = new ArrayBuffer[String]()
 
       def addElem(op: Op*) = {
         op.foreach( _ match {
           case lineOp(i) => {
             import js.JSConverters._
-            matrix = matrix :+ i.toJSArray;
+            println("Avant le line op")
+            matrix += i.to[ArrayBuffer]
             println("Après le line op")
             println(matrix)
           }
           case columnOp(i) => {
-            for((x,j) <- matrix.view.zipWithIndex){ x.push(i(j))}
+            for((x,j) <- matrix.view.zipWithIndex){matrix(j)+= i(j)}
           }
           case colorOp(i) => { colors = colors :+ i; println(colors)}
           case _ => println(op);
         })
-
         generate();
       }
 
       def apply(op: Op*)  = {
         op.foreach( _ match {
-          //case matrixOp(i) => matrix.push(i)
-          case colorOp(i) => test = i
+          case widthOp(i) => {d3.select("svg").attr("width", i); d3.select("svg").attr("height", i)}
         })
       }
 
       def generate()  = {
-
-
         import js.JSConverters._
+        println("SALUT")
         var colorJS : js.Array[String] = colors.toJSArray
-        var matrixJS : js.Array[js.Array[Double]] = matrix.toJSArray
-        println("la matrice")
-        println(matrixJS(0))
-        println(matrixJS(1))
+        var matrixJS : js.Array[js.Array[Double]] = new js.Array[js.Array[Double]]()
+        matrix.foreach(x => matrixJS.push(x.toJSArray))
+        println("SALUT")
         import d3v4.d3
         val svg = d3.select("svg")
+        println("8")
         val width = svg.attr("width").toDouble
         val height = svg.attr("height").toDouble
         val outerRadius = Math.min(width, height) * 0.5 - 40
         val innerRadius = outerRadius - 30
+        println("9")
         val formatValue = d3.formatPrefix(",.0", 1e3)
         val chord = d3.chord().padAngle(0.05).sortSubgroups(d3.descending)
         val arc = d3.arc().innerRadius(innerRadius).outerRadius(outerRadius)
         val ribbon = d3.ribbon().radius(innerRadius)
 
         val color = d3.scaleOrdinal[Int, String]().domain(d3.range(5)).range(colorJS)
+        println("1")
         val g: Selection[ChordArray] = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")").datum(chord(matrixJS))
+        println("2")
         val group = g.append("g").attr("class", "groups")
           .selectAll("g")
           .data((c: ChordArray) => c.groups)
           .enter().append("g")
-
-
-        group.append("path").style("fill", (d: ChordGroup) => color(d.index))
-          .style("stroke", (d: ChordGroup) => d3.rgb(color(d.index)).darker())
-          .attr("d", (x: ChordGroup) => arc(x))
 
         var groupTick = group.selectAll(".group-tick").data((d: ChordGroup) => groupTicks(d, 1e3))
           .enter().append("g").attr("class", "group-tick")
@@ -190,32 +189,35 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
           .style("fill", (d: Chord) => color(d.target.index))
           .style("stroke", (d: Chord) => d3.rgb(color(d.target.index)).darker())
 
+
       }
 
+      def multiply(x: Double) = {
 
+      }
     }
 
 
     @JSExport
     def main(args: Array[String]): Unit = {
-      create a chord ; // a remplacer par width
+      create a chord where (width is 960.0)
       add elemTo chord having (data is (55), color is "#FFDD89");
-     // add elemTo chord having (data from (12,15),data to (15,13), color is "#68bfac")
-      generate the chord;
+      generate the chord
       select the item named "sizeButton" make resizeFunction
       select the item named "resetButton" make resetDataFunction
       select the item named "addDataButton" make {() =>
-        add elemTo chord having (origin from "originInput",destination from "destinationInput", color from "colorInput")}
+        add elemTo chord having (origin from "originInput", destination from "destinationInput", color from "colorInput")}
+     // chord + 12
     }
 
     def resizeFunction() = {
-        //d3.select("svg").attr("width", 100)
       import d3v4.d3
       println(d3.select("#from").property("value"))
     }
 
     def resetDataFunction() = {
-      d3.select("svg").attr("width", 100)
+      println("test")
+      MyChordGraph.resetData();
     }
 
     def addDataFunction() = {
