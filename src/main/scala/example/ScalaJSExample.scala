@@ -1,14 +1,62 @@
 package example
 
 import d3v4._
+
+
 import scala.collection.mutable.ArrayBuffer
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 object ScalaJSExample {
+  @JSExport
+  def main(args: Array[String]): Unit = {
+    var matrix1 = create a matrix having (
+      line(50,20),
+      line(30,10)
+    )
+    var matrix2 = create a matrix having(
+      line(2,3),
+      line(8,1)
+    )
+    var matrix3 = create a matrix having(
+      line(1,1),
+      line(2,1)
+    )
+    create the chord where (width is 1000,
+      data is matrix1+matrix2,
+      color are ("#000000","#00E6FF"),
+      format is money,
+      label every 100,
+      graduation every 100)
+
+    //create the chord where (width is 1000,
+    //                        data is matrix1*matrix3*2,
+    //                        color are ("#000000","#00E6FF","#3C00FF"))
+
+    add elemTo chord having (origin from (20,20,20),
+                            destination to (20,20,20),
+                            color is "#09FF00");
+                            generate the chord
+
+    select in chord column 1 to 2 line * display;
+
+    select the item named "resetButton" make (() => reset the chord)
+
+    select the item named "addDataButton" make {() =>
+      add elemTo chord having (origin from "originInput",
+        destination from "destinationInput",
+        color from "colorInput",
+        regenerate is true)}
+    
+    select the item named "addFirstDataButton" make{() =>
+      add elemTo chord having (data from "firstInput",
+        color from "colorInput",
+        regenerate is true);
+    }
+  }
+
     @JSExportTopLevel("myproject")
     protected def getInstance(): this.type = this
-  
     def * :String ={
       return "all"
     }
@@ -19,7 +67,6 @@ object ScalaJSExample {
     }
 
   trait Op
-
   case class colorOp(i: String) extends Op
   case class lineOp(i: Array[Double]) extends Op
   case class columnOp(i: Array[Double]) extends Op
@@ -32,48 +79,20 @@ object ScalaJSExample {
   case class graduationOp(i: Int) extends Op
   case class labelOp(i: Int) extends Op
 
-  object reset {
-    def the(o : DO) = o match{
-      case chord => MyChordGraph.resetData()
-    }
-  }
-
+  object reset {def the(o : DO) = o match{ case chord => MyChordGraph.resetData()}}
   object create {
-    def the(o: DO) = o match {
-      case chord => new ChordGraph()
-    }
-    def a(o: DO) = o match {
-      case matrix => new Matrix()
-    }
+    def the(o: DO) = o match {case chord => new ChordGraph()}
+    def a(o: DO) = o match {case matrix => new Matrix()}
   }
-
   object select {
-    def the(o : DO) = o match {
-      case item => new itemClass()
-    }
-    def in (o: DO) = o match{
-      case chord => new readMatrix()
-    }
+    def the(o : DO) = o match {case item => new itemClass()}
+    def in (o: DO) = o match{case chord => new readMatrix()}
   }
+  object generate{ def the(o: DO) = o match {case chord => MyChordGraph.generate()}}
+  object add {def elemTo(o: DO) = o match {case chord => new ChordGraph()}}
 
-  object generate{
-    def the(o: DO) = o match {
-      case chord => MyChordGraph.generate()
-    }
-  }
-
-  object add {
-    def elemTo(o: DO) = o match {
-      case chord => new ChordGraph()
-      case _     => throw new Exception()
-    }
-  }
-
-    trait DO
-
-  object chord extends DO {
-    def select() = new readMatrix()
-  }
+  trait DO
+  object chord extends DO {def select() = new readMatrix()}
   object item extends DO
   object matrix extends DO {
     def empty(line : Int, col : Int) : Matrix = {
@@ -86,7 +105,6 @@ object ScalaJSExample {
       return new Matrix(tmp)
     }
   }
-
 
   class readMatrix {
       var myindices:Array[Int] = new Array[Int](4)
@@ -145,24 +163,13 @@ object ScalaJSExample {
     case object space extends Format
     case object dot extends Format
     case object thousand extends Format
-    object graduation {
-      def every(i : Int) = graduationOp(i)
-    }
-    object label {
-      def every(i: Int) = labelOp(i)
-    }
-    object line {
-      def apply(i : Double*) = {
-        lineMatrixOp(i.toArray)
-      }
-    }
-    object regenerate {
-      def is(i : Boolean) = genOp(i)
-    }
+
+    object graduation { def every(i : Int) = graduationOp(i)}
+    object label {def every(i: Int) = labelOp(i)}
+    object line {def apply(i : Double*) = {lineMatrixOp(i.toArray)}}
+    object regenerate {def is(i : Boolean) = genOp(i)}
     object format{
-      //def is(f : money) = { }
      def is(f : Format) = {
-        println(f.toString())
         f.toString() match {
           case "dot" => formatOp(".^20",42) // dot-filled and centered, ".........42........."
           case "money" => formatOp("($.2f",-3.5) // localized fixed-point currency, "(£3.50)"
@@ -174,9 +181,7 @@ object ScalaJSExample {
     object color {
       def is (i : String) = colorOp(i)
       def are (i: String*) = {val tmp : Array[String] = i.toArray; colorsOp(tmp)}
-      def from (i : String) = {
-        val tmp = d3.select("#"+i).property("value")
-        colorOp(tmp)}
+      def from (i : String) = {colorOp(d3.select("#"+i).property("value"))}
     }
     object data {
       def is (i : Matrix) = matrixOp(i)
@@ -190,7 +195,7 @@ object ScalaJSExample {
       }
     }
     object origin {
-      def from (i : Double*) = {val tmp : Seq[Double] = i; columnOp(tmp.toArray)}
+      def from (i : Double*) = {columnOp(i.toArray)}
       def from (i:String) = {
         val tmp = d3.select("#"+i).property("value").split(",").map(_.toDouble)
         d3.select("#"+i).property("value","");
@@ -203,7 +208,7 @@ object ScalaJSExample {
         d3.select("#"+i).property("value","");
         lineOp(tmp)
       }
-      def to (i : Double*) = {val tmp : Seq[Double] = i; lineOp(tmp.toArray)}
+      def to (i : Double*) = {lineOp(i.toArray)}
     }
     object  width { def is( i :Double) = widthOp(i)}
 
@@ -319,65 +324,4 @@ object ScalaJSExample {
         generate()
       }
     }
-    @JSExport
-    def main(args: Array[String]): Unit = {
-      var matrix1 = create a matrix having (
-        line(50,20,80),
-        line(30, 10, 90),
-        line(10, 50, 80)
-      )
-      var matrix2 = create a matrix having(
-        line(2,3,5),
-        line(8,1,1),
-        line(1,2,3)
-      )
-      var matrix3 = create a matrix having(
-        line(1,1,5),
-        line(2,1,1),
-        line(1,2,3)
-      )
-      create the chord where (width is 1000,
-                              data is matrix1+matrix2,
-                              color are ("#000000","#00E6FF","#3C00FF"),
-                              format is money,
-                              label every 100,
-                              graduation every 100)
-
-      //create the chord where (width is 1000,
-      //                        data is matrix1*matrix3*2,
-      //                        color are ("#000000","#00E6FF","#3C00FF"))
-
-      add elemTo chord having (origin from (20,20,20,20),
-                              destination to (20,20,20,20),
-                              color is "#09FF00");
-      generate the chord
-
-      select in chord column 1 to 2 line * display;
-
-      select the item named "resetButton" make (() => reset the chord)
-      select the item named "addDataButton" make {() =>
-        add elemTo chord having (origin from "originInput",
-                                destination from "destinationInput",
-                                color from "colorInput",
-                                regenerate is true)}
-      select the item named "addFirstDataButton" make{() =>
-        add elemTo chord having (data from "firstInput",
-                                color from "colorInput",
-                                regenerate is true);
-    }
-
-    def resizeFunction() = {
-      import d3v4.d3
-      println(d3.select("#from").property("value"))
-    }
-
-
-    def resetDataFunction() = {
-      MyChordGraph.resetData();
-    }
-
-    def addDataFunction() = {
-      d3.select("svg").attr("width", 100)
-    }
-  }
 }
