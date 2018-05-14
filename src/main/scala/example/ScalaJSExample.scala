@@ -1,9 +1,6 @@
 package example
 
 import d3v4._
-import example.ScalaJSExample.MyChordGraph.{generate}
-import example.ScalaJSExample.generate
-
 import scala.collection.mutable.ArrayBuffer
 import scala.reflect.ClassTag
 import scala.scalajs.js
@@ -201,7 +198,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
       select the item named "resetButton" make resetDataFunction
       select the item named "addDataButton" make {() =>
         add elemTo chord having (origin from "originInput", destination from "destinationInput", color from "colorInput")}
-     // chord + 12
+
     }
 
     def resizeFunction() = {

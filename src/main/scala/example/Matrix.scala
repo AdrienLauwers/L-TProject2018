@@ -21,7 +21,7 @@ object MatrixRange {
 
 // A star, indicating a range containing "all" elements
 object * extends MatrixRange {
-  override def content(maxSize: Int): Iterable[Int] = 0 until maxSize
+  override def content(maxSize: Int): Iterable[Int] = (0 until maxSize).map(println(_))
 }
 
 
@@ -189,6 +189,6 @@ object MyExample extends App {
 object ScalaJSExample extends js.JSApp {
 
   def main(): Unit = {
-
+    (0 until 10).map(println(_))
   }
 }
