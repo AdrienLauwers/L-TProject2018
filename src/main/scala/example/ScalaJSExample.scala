@@ -78,18 +78,18 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
         index += 2
         return this
       }
-      def end(): Array[Array[Double]]={
+      def end(): ArrayBuffer[ArrayBuffer[Double]]={
         var test  = new ArrayBuffer[ArrayBuffer[Double]]()
-        var i:Int;
-        var j:Int;
+        var i:Int =0;
+        var j:Int=0;
         var index :Int =0;
         for(i <- myindices(0)-1 to myindices(1)-1){
           for( j<- myindices(2)-1 to myindices(3)-1){
-            test(index) :+= MyChordGraph.matrix(j)(j)
+            test(index) :+= MyChordGraph.matrix(i)(j)
           }
           index +=1
         }
-
+        return test
       }
     }
 
