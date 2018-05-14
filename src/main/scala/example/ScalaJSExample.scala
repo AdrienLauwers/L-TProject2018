@@ -2,11 +2,11 @@ package example
 
 import d3v4._
 import scala.collection.mutable.ArrayBuffer
-import scala.reflect.ClassTag
+
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-  object ScalaJSExample {
+object ScalaJSExample {
     @JSExportTopLevel("myproject")
     protected def getInstance(): this.type = this
 

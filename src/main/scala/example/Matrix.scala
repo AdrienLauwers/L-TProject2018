@@ -1,5 +1,5 @@
 package example
-
+/*
 import scala.reflect.ClassTag
 import scala.scalajs.js
 import MatrixRange._
@@ -191,4 +191,4 @@ object ScalaJSExample extends js.JSApp {
   def main(): Unit = {
     (0 until 10).map(println(_))
   }
-}
+}*/
