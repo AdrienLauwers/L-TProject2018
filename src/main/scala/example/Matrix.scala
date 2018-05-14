@@ -185,10 +185,4 @@ object MyExample extends App {
   println(matrix)
   println()
 }
-
-object ScalaJSExample extends js.JSApp {
-
-  def main(): Unit = {
-    (0 until 10).map(println(_))
-  }
-}*/
+*/

@@ -46,52 +46,54 @@ object ScalaJSExample {
 
     class readMatrix {
       var myindices:Array[Int] = new Array[Int](4)
-      var index =0
+      var isline:Boolean=true;
       def line(i: Int):readMatrix={
-        myindices(index) = i
-        index+=1
+        myindices(0) = i
         return this
       }
       def line(i : String): readMatrix={
         myindices(0) = 1
         myindices(1) = MyChordGraph.matrix.length
-        index += 2
         return this
       }
       def to(i: Int):readMatrix={
-        myindices(index) = i
-        index+=1
+        if(isline){
+          myindices(1) = i
+        }
+        else{
+          myindices(3) = i
+        }
         return this
       }
-
       def column(i: Int):readMatrix={
-        myindices(index) = i
-        index+=1
+        myindices(2) = i
+        isline = false;
         return this
       }
       def column(i : String): readMatrix ={
         myindices(2) = 1
         myindices(3) = MyChordGraph.matrix(0).length
-        index += 2
+        isline=false
         return this
       }
       def end(): ArrayBuffer[ArrayBuffer[Double]]={
+
         var test  = new ArrayBuffer[ArrayBuffer[Double]]()
         var i:Int =0;
         var j:Int=0;
         var index :Int =0;
         for(i <- myindices(0)-1 to myindices(1)-1){
           test += new ArrayBuffer[Double](0)
-          println("iiii :" + i)
           for( j<- myindices(2)-1 to myindices(3)-1){
-            println("jjjj : " + j)
-            println(MyChordGraph.matrix(i)(j))
-            println("flip")
             test(index) += MyChordGraph.matrix(i)(j)
           }
           index +=1
         }
         return test
+      }
+      def display(): Unit =
+      {
+        println(end())
       }
     }
 
@@ -252,10 +254,7 @@ object ScalaJSExample {
       create a chord where (width is 960.0)
       add elemTo chord having (data is (55), color is "#FFDD89");
       generate the chord
-      println("mabite dans le cul à corrado")
-      var mabite = select in matrix line * column * end;
-      println(mabite)
-      println("le cul à corrado est defonce")
+      select in matrix column * line * display;
       select the item named "sizeButton" make resizeFunction
       select the item named "resetButton" make resetDataFunction
       select the item named "addDataButton" make {() =>
