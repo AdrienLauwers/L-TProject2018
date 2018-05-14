@@ -143,28 +143,22 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
       def generate()  = {
         import js.JSConverters._
-        println("SALUT")
         var colorJS : js.Array[String] = colors.toJSArray
         var matrixJS : js.Array[js.Array[Double]] = new js.Array[js.Array[Double]]()
         matrix.foreach(x => matrixJS.push(x.toJSArray))
-        println("SALUT")
         import d3v4.d3
         val svg = d3.select("svg")
-        println("8")
         val width = svg.attr("width").toDouble
         val height = svg.attr("height").toDouble
         val outerRadius = Math.min(width, height) * 0.5 - 40
         val innerRadius = outerRadius - 30
-        println("9")
         val formatValue = d3.formatPrefix(",.0", 1e3)
         val chord = d3.chord().padAngle(0.05).sortSubgroups(d3.descending)
         val arc = d3.arc().innerRadius(innerRadius).outerRadius(outerRadius)
         val ribbon = d3.ribbon().radius(innerRadius)
 
         val color = d3.scaleOrdinal[Int, String]().domain(d3.range(5)).range(colorJS)
-        println("1")
         val g: Selection[ChordArray] = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")").datum(chord(matrixJS))
-        println("2")
         val group = g.append("g").attr("class", "groups")
           .selectAll("g")
           .data((c: ChordArray) => c.groups)
