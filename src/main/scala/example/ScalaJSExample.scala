@@ -10,6 +10,10 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
     @JSExportTopLevel("myproject")
     protected def getInstance(): this.type = this
 
+    def * :String ={
+      return "all"
+    }
+
     def groupTicks(d: ChordGroup, step: Double): js.Array[js.Dictionary[Double]] = {
       val k: Double = (d.endAngle - d.startAngle) / d.value
       d3.range(0, d.value, step).map((v: Double) => js.Dictionary("value" -> v, "angle" -> (v * k + d.startAngle)))
@@ -28,15 +32,65 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
        case item => new itemClass()
        case _ => new itemClass()
       }
+      def in (o: DO) = o match{
+        case matrix => new readMatrix()
+      }
     }
 
     object generate{
       def the(o: DO) = o match {
         case chord => MyChordGraph.generate()
-        case geoMap => new geoMap()
         case _     => throw new Exception()
       }
     }
+
+    class readMatrix {
+      var myindices:Array[Int] = new Array[Int](4)
+      var index =0
+      def line(i: Int):readMatrix={
+        myindices(index) = i
+        index+=1
+        return this
+      }
+      def line(i : String): readMatrix={
+        myindices(0) = 0
+        myindices(1) = MyChordGraph.matrix.length - 1
+        index += 2
+        return this
+      }
+      def to(i: Int):readMatrix={
+        myindices(index) = i
+        index+=1
+        return this
+      }
+
+      def column(i: Int):readMatrix={
+        myindices(index) = i
+        index+=1
+        return this
+      }
+      def column(i : String): readMatrix ={
+        myindices(2) = 0
+        myindices(3) = MyChordGraph.matrix(0).length - 1
+        index += 2
+        return this
+      }
+      def end(): Array[Array[Double]]={
+        var test  = new ArrayBuffer[ArrayBuffer[Double]]()
+        var i:Int;
+        var j:Int;
+        var index :Int =0;
+        for(i <- myindices(0)-1 to myindices(1)-1){
+          for( j<- myindices(2)-1 to myindices(3)-1){
+            test(index) :+= MyChordGraph.matrix(j)(j)
+          }
+          index +=1
+        }
+
+      }
+    }
+
+
 
     object add {
       def elemTo(o: DO) = o match {
@@ -49,6 +103,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
     object chord extends DO
     object geoMap extends DO
     object item extends DO
+    object matrix extends DO
 
     trait Op
     case class colorOp(i: String) extends Op
@@ -93,9 +148,6 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
       def having(op: Op*) = MyChordGraph.addElem(op:_*)
     }
 
-    class geoMap() {
-      def tamere(op: Op*) = MyChordGraph(op:_*)
-    }
 
     class Action(name : String) {
       def make(fnct: () => Unit) = {
@@ -186,6 +238,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
       def multiply(x: Double) = {
 
       }
+
     }
 
 
@@ -194,6 +247,8 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
       create a chord where (width is 960.0)
       add elemTo chord having (data is (55), color is "#FFDD89");
       generate the chord
+      println("mabite dans le cul à corrado")
+      var mabite = select in matrix line 1 to 5 column * end;
       select the item named "sizeButton" make resizeFunction
       select the item named "resetButton" make resetDataFunction
       select the item named "addDataButton" make {() =>
