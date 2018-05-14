@@ -31,15 +31,33 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
        case item => new itemClass()
        case _ => new itemClass()
       }
+      def in (o: DO) = o match{
+        case matrix => new readMatrix()
+      }
     }
 
     object generate{
       def the(o: DO) = o match {
         case chord => MyChordGraph.generate()
-        case geoMap => new geoMap()
         case _     => throw new Exception()
       }
     }
+
+    class readMatrix {
+      var myindices:Array[Int] = new Array[Int](4)
+      var index =0
+      def line(i: Int){
+        myindices(index) = i
+        index+=1
+      }
+      def line(i : String): Unit ={
+        myindices(0) = 0
+        myindices(1) = MyChordGraph.matrix.length - 1
+        index += 2
+      }
+    }
+
+
 
     object add {
       def elemTo(o: DO) = o match {
@@ -94,14 +112,10 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
       def having(op: Op*) = MyChordGraph.addElem(op:_*)
     }
 
-    class geoMap() {
-      def tamere(op: Op*) = MyChordGraph(op:_*)
-    }
 
     class Action(name : String) {
       def make(fnct: () => Unit) = {
 
-        //d3.select("#"+name).on("click", () => fnct)
         d3.scaleLinear()
         println(name)
         d3.select("#"+name).on("click", () => fnct())
@@ -201,11 +215,13 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
       create a chord ; // a remplacer par width
       add elemTo chord having (data is (55), color is "#FFDD89");
      // add elemTo chord having (data from (12,15),data to (15,13), color is "#68bfac")
-      generate the chord;
+      generate the chord
+      select in matrix * 1 to 3
       select the item named "sizeButton" make resizeFunction
       select the item named "resetButton" make resetDataFunction
       select the item named "addDataButton" make {() =>
         add elemTo chord having (origin from "originInput",destination from "destinationInput", color from "colorInput")}
+
     }
 
     def resizeFunction() = {
