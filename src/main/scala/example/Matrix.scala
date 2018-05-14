@@ -1,19 +1,16 @@
 package example
-/*
-import scala.reflect.ClassTag
 
+import scala.reflect.ClassTag
+import scala.scalajs.js
+import MatrixRange._
+import Matrix._
 
 trait MatrixRange {
   def content(maxSize: Int): Iterable[Int]
 }
 
 object MatrixRange {
-  implicit def intToMatrixRange(x: Int):
-}
-
-class MatrixView[T:ClassTag](matrix: Matrix[T], pos: Array[Array[(Int, Int)]]) extends MatrixLike[T] {
-  override def apply(entry: Int): VectorLike[T] = ???
-  override def apply(entries: MatrixRange): MatrixLike[T] = ? MatrixRange = new MatrixRange {
+  implicit def intToMatrixRange(x: Int): MatrixRange = new MatrixRange {
     override def content(maxSize: Int): Iterable[Int] = Array(x)
   }
 
@@ -24,8 +21,9 @@ class MatrixView[T:ClassTag](matrix: Matrix[T], pos: Array[Array[(Int, Int)]]) e
 
 // A star, indicating a range containing "all" elements
 object * extends MatrixRange {
-  override def content(maxSize: Int): Iterable[Int] = 0 until maxSize
+  override def content(maxSize: Int): Iterable[Int] = (0 until maxSize).map(println(_))
 }
+
 
 trait VectorLike[T] extends IndexedSeq[T] {
   def apply(entry: Int): T
@@ -152,6 +150,7 @@ object Matrix {
 }
 
 object MyExample extends App {
+
   val matrix = new Matrix(Array(
     Array(1, 2, 0, 3),
     Array(1, 0, 1, 3),
@@ -186,4 +185,10 @@ object MyExample extends App {
   println(matrix)
   println()
 }
-*/
+
+object ScalaJSExample extends js.JSApp {
+
+  def main(): Unit = {
+    (0 until 10).map(println(_))
+  }
+}
