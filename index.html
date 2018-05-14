@@ -29,16 +29,34 @@
   See README.md for detailed explanations.</p>
 <button id="sizeButton">Modify size</button>
 <button id="resetButton" onclick="document.getElementById('graph').innerHTML = ''">Reset data</button>
-<button id="addDataButton" onclick="document.getElementById('graph').innerHTML = ''">Add data</button>
+<button id="addFirstDataButton" onclick="document.getElementById('graph').innerHTML = ''; displayFromTo();">Add first data</button>
+<button id="addDataButton" onclick="document.getElementById('graph').innerHTML = ''; hideFromTo();">Add data</button>
 <input type="text" id="originInput" placeholder="from">
 <input type="text" id="destinationInput" placeholder="to">
+<input type="text" id="firstInput" placeholder="to">
 <input type="color" id="colorInput">
 <div id="playground">
   <svg id="graph"></svg>
 </div>
 
 <script type="text/javascript" src="./target/scala-2.12/scalajs-bundler/main/example-fastopt-bundle.js"></script>
-
+<script>
+  function hideFromTo(){
+      document.getElementById('originInput').style.display = "none";
+      document.getElementById('destinationInput').style.display = "none";
+      document.getElementById('addDataButton').style.display = "none";
+      document.getElementById('addFirstDataButton').style.display = "block";
+      document.getElementById('firstInput').style.display = "block";
+  }
+  function displayFromTo(){
+      document.getElementById('originInput').style.display = "block";
+      document.getElementById('destinationInput').style.display = "block";
+      document.getElementById('addDataButton').style.display = "block";
+      document.getElementById('addFirstDataButton').style.display = "none";
+      document.getElementById('firstInput').style.display = "none";
+  }
+  hideFromTo()
+</script>
 
 </body>
 </html>

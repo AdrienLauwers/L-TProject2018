@@ -117,7 +117,11 @@ object ScalaJSExample {
     case class lineOp(i: Array[Double]) extends Op
     case class columnOp(i: Array[Double]) extends Op
     case class widthOp(i: Double) extends Op
+    case class genOp(i : Boolean) extends Op
 
+    object regenerate {
+      def is(i : Boolean) = genOp(i)
+    }
     object color {
       def is (i : String) = colorOp(i)
       def from (i : String) = {
@@ -126,7 +130,7 @@ object ScalaJSExample {
     }
     object data {
       def is (i : Double*) = {val tmp : Array[Double] = i.toArray; lineOp(tmp)}
-      def from (i : Double*) = {val tmp : Seq[Double] = i; columnOp(tmp.toArray)}
+      def from (i : Double*) = {val tmp : Seq[Double] = i; lineOp(tmp.toArray)}
       def to (i : Double*) = {val tmp : Seq[Double] = i; lineOp(tmp.toArray)}
     }
     object origin {
@@ -185,10 +189,13 @@ object ScalaJSExample {
           case columnOp(i) => {
             for((x,j) <- matrix.view.zipWithIndex){matrix(j)+= i(j)}
           }
+          case genOp(i) => {
+            if(i){ generate()}
+          }
           case colorOp(i) => { colors = colors :+ i; println(colors)}
           case _ => println(op);
         })
-        generate();
+
       }
 
       def apply(op: Op*)  = {
@@ -252,14 +259,15 @@ object ScalaJSExample {
     @JSExport
     def main(args: Array[String]): Unit = {
       create a chord where (width is 960.0)
-      add elemTo chord having (data is (55), color is "#FFDD89");
-      generate the chord
+      //add elemTo chord having (data is (55), color is "#FFDD89");
+      //generate the chord
       select in matrix column * line * display;
       select the item named "sizeButton" make resizeFunction
       select the item named "resetButton" make resetDataFunction
       select the item named "addDataButton" make {() =>
-        add elemTo chord having (origin from "originInput", destination from "destinationInput", color from "colorInput")}
-
+        add elemTo chord having (origin from "originInput", destination from "destinationInput", color from "colorInput", regenerate is true)}
+      select the item named "addFirstDataButton" make{() =>
+        add elemTo chord having (data from (55), color from "colorInput", regenerate is true);
     }
 
     def resizeFunction() = {
@@ -275,7 +283,6 @@ object ScalaJSExample {
     def addDataFunction() = {
       d3.select("svg").attr("width", 100)
     }
-
-
+  }
 }
 
