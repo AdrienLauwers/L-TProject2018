@@ -53,8 +53,8 @@ object ScalaJSExample {
         return this
       }
       def line(i : String): readMatrix={
-        myindices(0) = 0
-        myindices(1) = MyChordGraph.matrix.length - 1
+        myindices(0) = 1
+        myindices(1) = MyChordGraph.matrix.length
         index += 2
         return this
       }
@@ -70,8 +70,8 @@ object ScalaJSExample {
         return this
       }
       def column(i : String): readMatrix ={
-        myindices(2) = 0
-        myindices(3) = MyChordGraph.matrix(0).length - 1
+        myindices(2) = 1
+        myindices(3) = MyChordGraph.matrix(0).length
         index += 2
         return this
       }
@@ -81,8 +81,13 @@ object ScalaJSExample {
         var j:Int=0;
         var index :Int =0;
         for(i <- myindices(0)-1 to myindices(1)-1){
+          test += new ArrayBuffer[Double](0)
+          println("iiii :" + i)
           for( j<- myindices(2)-1 to myindices(3)-1){
-            test(index) :+= MyChordGraph.matrix(i)(j)
+            println("jjjj : " + j)
+            println(MyChordGraph.matrix(i)(j))
+            println("flip")
+            test(index) += MyChordGraph.matrix(i)(j)
           }
           index +=1
         }
@@ -248,7 +253,9 @@ object ScalaJSExample {
       add elemTo chord having (data is (55), color is "#FFDD89");
       generate the chord
       println("mabite dans le cul à corrado")
-      var mabite = select in matrix line 1 to 5 column * end;
+      var mabite = select in matrix line * column * end;
+      println(mabite)
+      println("le cul à corrado est defonce")
       select the item named "sizeButton" make resizeFunction
       select the item named "resetButton" make resetDataFunction
       select the item named "addDataButton" make {() =>
