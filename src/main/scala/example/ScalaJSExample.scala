@@ -19,6 +19,11 @@ object ScalaJSExample {
       d3.range(0, d.value, step).map((v: Double) => js.Dictionary("value" -> v, "angle" -> (v * k + d.startAngle)))
     }
 
+    object reset {
+      def the(o : DO) = o match{
+        case chord => MyChordGraph.resetData()
+      }
+    }
     object create {
       def a(o: DO) = o match {
         case chord => new ChordGraph()
@@ -131,9 +136,15 @@ object ScalaJSExample {
     object data {
       def is (i : Double*) = {val tmp : Array[Double] = i.toArray; lineOp(tmp)}
       def from (i : Double*) = {val tmp : Seq[Double] = i; lineOp(tmp.toArray)}
-      def to (i : Double*) = {val tmp : Seq[Double] = i; lineOp(tmp.toArray)}
+      def to (i : Double*) = {val tmp : Seq[Double] = i; columnOp(tmp.toArray)}
+      def from (i:String) = {
+        val tmp = d3.select("#"+i).property("value").split(",").map(_.toDouble)
+        d3.select("#"+i).property("value","");
+        lineOp(tmp)
+      }
     }
     object origin {
+      def from (i : Double*) = {val tmp : Seq[Double] = i; columnOp(tmp.toArray)}
       def from (i:String) = {
         val tmp = d3.select("#"+i).property("value").split(",").map(_.toDouble)
         d3.select("#"+i).property("value","");
@@ -146,6 +157,7 @@ object ScalaJSExample {
         d3.select("#"+i).property("value","");
         lineOp(tmp)
       }
+      def to (i : Double*) = {val tmp : Seq[Double] = i; lineOp(tmp.toArray)}
     }
     object  width { def is( i :Double) = widthOp(i)}
 
@@ -169,11 +181,6 @@ object ScalaJSExample {
     }
 
     object MyChordGraph extends DO {
-      def resetData() = {
-       // matrix = List(List(50))
-       // colors = List("#FFDD89")
-        generate()
-      }
       var matrix = new ArrayBuffer[ArrayBuffer[Double]]()
       var colors = new ArrayBuffer[String]()
 
@@ -249,25 +256,29 @@ object ScalaJSExample {
 
       }
 
-      def multiply(x: Double) = {
-
+      def resetData() = {
+        matrix = new ArrayBuffer[ArrayBuffer[Double]]()
+        colors = new ArrayBuffer[String]()
+        generate()
       }
-
     }
 
 
     @JSExport
     def main(args: Array[String]): Unit = {
       create a chord where (width is 960.0)
-      //add elemTo chord having (data is (55), color is "#FFDD89");
-      //generate the chord
+      add elemTo chord having (data is (55), color is "#FFDD89");
+      add elemTo chord having (origin from (10,22), destination to (35,41),color is "#FDDDDDDD");
+      add elemTo chord having (origin from (10,22,55), destination to (35,41,55),color is "#FEEEEEEE");
+      generate the chord
       select in matrix column * line * display;
-      select the item named "sizeButton" make resizeFunction
-      select the item named "resetButton" make resetDataFunction
+      change the chord where (matrix is matrix1 + matrix2)
+
+      select the item named "resetButton" make (() => reset the chord)
       select the item named "addDataButton" make {() =>
         add elemTo chord having (origin from "originInput", destination from "destinationInput", color from "colorInput", regenerate is true)}
       select the item named "addFirstDataButton" make{() =>
-        add elemTo chord having (data from (55), color from "colorInput", regenerate is true);
+        add elemTo chord having (data from "firstInput", color from "colorInput", regenerate is true);
     }
 
     def resizeFunction() = {
@@ -276,7 +287,6 @@ object ScalaJSExample {
     }
 
     def resetDataFunction() = {
-      println("test")
       MyChordGraph.resetData();
     }
 
