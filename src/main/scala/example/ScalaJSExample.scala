@@ -70,18 +70,22 @@ object ScalaJSExample {
       d3.range(0, d.value, step).map((v: Double) => js.Dictionary("value" -> v, "angle" -> (v * k + d.startAngle)))
     }
 
+  /** Used in the DSL to select a range of data in the matrix of the chord**/
   class readMatrix {
       var myindices:Array[Int] = new Array[Int](4)
       var isline:Boolean=true;
+      /** specify the start line **/
       def line(i: Int):readMatrix={
         myindices(0) = i
         return this
       }
+     /** If user call line(*) -> It selections all the lines*/
       def line(i : String): readMatrix={
         myindices(0) = 1
         myindices(1) = MyChordGraph.lineLength
         return this
       }
+      /** specify the end line **/
       def to(i: Int):readMatrix={
         if(isline){
           myindices(1) = i
@@ -91,17 +95,20 @@ object ScalaJSExample {
         }
         return this
       }
+      /** specify the start column**/
       def column(i: Int):readMatrix={
         myindices(2) = i
         isline = false;
         return this
       }
+      /** specify the end column**/
       def column(i : String): readMatrix ={
         myindices(2) = 1
         myindices(3) = MyChordGraph.columnLength
         isline=false
         return this
       }
+      /**  select the range of data that user want**/
       def end(): ArrayBuffer[ArrayBuffer[Double]]={
         var test  = new ArrayBuffer[ArrayBuffer[Double]]()
         var i:Int =0;
@@ -116,16 +123,19 @@ object ScalaJSExample {
         }
         return test
       }
+      /** display the range of data that user want **/
       def display(): Unit =
       {
         println(end())
       }
     }
 
+  /** This correspond to the objetcs on wich we want to make action **/
   trait DO
   object chord extends DO {def select() = new readMatrix()}
   object item extends DO
   object matrix extends DO {
+    /** create an empty matrix **/
     def empty(line : Int, col : Int) : Matrix = {
       var tmp = ArrayBuffer[ArrayBuffer[Double]]();
       var tmp2 = Array.ofDim[Double](line, col);
@@ -137,25 +147,30 @@ object ScalaJSExample {
     }
   }
 
-
-  trait Order
+    /** Define the different sort of ordering **/
+    trait Order
     case object descending extends Order
     case object ascending extends Order
 
+    /** Used in the DSL **/
     class itemClass
     {
       def named(name : String) : Action = { new Action(name)}
     }
 
+    /** Used in the DSL**/
     class ChordGraph {
+      /** Used to construct of the chord using the DSL **/
       def where(op: Op*) = MyChordGraph.construct(op:_*)
+      /** Used to add an element into the chord using the DSL **/
       def having(op: Op*) = MyChordGraph.addElem(op:_*)
     }
 
+    /** Used in the DSL **/
     class Action(name : String) {
+      /** Used to interact with the web interface **/
       def make(fnct: () => Unit) = {
         d3.scaleLinear()
-        println(name)
         d3.select("#"+name).on("click", () => fnct())
       }
     }
