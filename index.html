@@ -31,6 +31,8 @@
 <input type="text" id="destinationInput" placeholder="to">
 <input type="text" id="firstInput" placeholder="only one element">
 <input type="color" id="colorInput">
+</br>
+<textarea id="matrixArea" disabled="true" placeholder="Matrix should be there" rows="4" cols="10" ></textarea>
 <div id="playground">
   <svg id="graph"></svg>
 </div>
@@ -55,6 +57,12 @@
   {
       document.getElementById('graph').innerHTML = ''
   }
+
+  function displayMatrix()
+  {
+
+  }
+
   setTimeout(function(){
       if( document.getElementById('graph').innerHTML == ''){
           hideFromTo()
@@ -63,6 +71,7 @@
           displayFromTo()
       }
   }, 500);
+
 </script>
 
 </body>

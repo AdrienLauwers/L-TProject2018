@@ -1,6 +1,6 @@
 package example
 
-import example.ScalaJSExample.{Op, lineMatrixOp, matrix}
+import example.ScalaJSExample._
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -71,6 +71,11 @@ class Matrix(var elements:ArrayBuffer[ArrayBuffer[Double]] = new ArrayBuffer[Arr
     })
     return this;
   }
+
+  def displayMatrix() = "[" + data.map {
+    _.foldLeft("")(_ + " " + _.toString)
+  }.reduceLeft(_ + "\n" + _) + "]"
+  
   def lineLength = data.length
   def columnLength = data(0).length
   def data = elements
