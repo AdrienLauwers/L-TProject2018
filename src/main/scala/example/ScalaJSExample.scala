@@ -23,11 +23,13 @@ object ScalaJSExample {
       line(2,1)
     )
     create the chord where (width is 1000,
-      data is matrix1+matrix2,
-      color are ("#000000","#00E6FF"),
-      format is money,
-      label every 100,
-      graduation every 100)
+                      data is matrix1+matrix2,
+                      color are ("#000000","#00E6FF"),
+                      format is money,
+                      label every 10,
+                      graduation every 10,
+                      order is descending,
+                      )
 
     //create the chord where (width is 1000,
     //                        data is matrix1*matrix3*2,
@@ -47,7 +49,7 @@ object ScalaJSExample {
         destination from "destinationInput",
         color from "colorInput",
         regenerate is true)}
-    
+
     select the item named "addFirstDataButton" make{() =>
       add elemTo chord having (data from "firstInput",
         color from "colorInput",
@@ -66,18 +68,6 @@ object ScalaJSExample {
       d3.range(0, d.value, step).map((v: Double) => js.Dictionary("value" -> v, "angle" -> (v * k + d.startAngle)))
     }
 
-  trait Op
-  case class colorOp(i: String) extends Op
-  case class lineOp(i: Array[Double]) extends Op
-  case class columnOp(i: Array[Double]) extends Op
-  case class widthOp(i: Double) extends Op
-  case class genOp(i: Boolean) extends Op
-  case class lineMatrixOp(i: Array[Double]) extends Op
-  case class matrixOp(i: Matrix) extends Op
-  case class colorsOp(i: Array[String]) extends Op
-  case class formatOp(s: String, d: Double) extends Op
-  case class graduationOp(i: Int) extends Op
-  case class labelOp(i: Int) extends Op
 
   object reset {def the(o : DO) = o match{ case chord => MyChordGraph.resetData()}}
   object create {
@@ -164,6 +154,32 @@ object ScalaJSExample {
     case object dot extends Format
     case object thousand extends Format
 
+    trait Order
+    case object descending extends Order
+    case object ascending extends Order
+
+    trait Op
+    case class colorOp(i: String) extends Op
+    case class lineOp(i: Array[Double]) extends Op
+    case class columnOp(i: Array[Double]) extends Op
+    case class widthOp(i: Double) extends Op
+    case class genOp(i: Boolean) extends Op
+    case class lineMatrixOp(i: Array[Double]) extends Op
+    case class matrixOp(i: Matrix) extends Op
+    case class colorsOp(i: Array[String]) extends Op
+    case class formatOp(s: String, d: Double) extends Op
+    case class graduationOp(i: Int) extends Op
+    case class labelOp(i: Int) extends Op
+    case class orderOp(i : Boolean) extends Op
+
+    object order {
+      def is(o : Order) = {
+        o.toString() match {
+          case "descending" => orderOp(true)
+          case "ascending"  => orderOp(false)
+        }
+      }
+    }
     object graduation { def every(i : Int) = graduationOp(i)}
     object label {def every(i: Int) = labelOp(i)}
     object line {def apply(i : Double*) = {lineMatrixOp(i.toArray)}}
@@ -237,7 +253,7 @@ object ScalaJSExample {
       var format2 = 0.123
       var labelEvery = 10
       var graduationEvery = 10
-
+      var descending = true
       def data = matrix.data
 
       def lineLength = matrix.lineLength
@@ -270,6 +286,7 @@ object ScalaJSExample {
             format2 = d;}
           case labelOp(i) => labelEvery = i;
           case graduationOp(i) => graduationEvery=i;
+          case orderOp(i) => descending = i
         })
       }
 
@@ -283,9 +300,13 @@ object ScalaJSExample {
         val width = svg.attr("width").toDouble
         val height = svg.attr("height").toDouble
         val outerRadius = Math.min(width, height) * 0.5 - 40
+        println(outerRadius)
         val innerRadius = outerRadius - 30
+        println(innerRadius)
         val formatValue = d3.formatPrefix(format1,format2)
-        val chord = d3.chord().padAngle(0.05).sortSubgroups(d3.descending)
+
+        val chord = if (descending) d3.chord().padAngle(0.05).sortSubgroups(d3.descending) else d3.chord().padAngle(0.05).sortSubgroups(d3.ascending)
+
         val arc = d3.arc().innerRadius(innerRadius).outerRadius(outerRadius)
         val ribbon = d3.ribbon().radius(innerRadius)
 
@@ -314,8 +335,6 @@ object ScalaJSExample {
           .attr("d", (d: Chord) => ribbon(d))
           .style("fill", (d: Chord) => color(d.target.index))
           .style("stroke", (d: Chord) => d3.rgb(color(d.target.index)).darker())
-
-
       }
 
       def resetData() = {
