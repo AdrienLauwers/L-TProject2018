@@ -6,19 +6,36 @@ import example.ScalaJSExample._
 import scala.collection.mutable.ArrayBuffer
 import scala.scalajs.js
 
+/** This object is used to get all the information
+  * and parameter provided by the user and generate the chord by using them
+  */
 object MyChordGraph extends DO {
+  /** Data to use in the chord **/
   var matrix = new Matrix();
+  /** Colors to user for each element in the chord **/
   var colors = new ArrayBuffer[String]()
-  var format1 = ".0%"
-  var format2 = 0.123
+  /** Format to use, the format by default is money **/
+  var format1 = "($.2f"
+  var format2 = -3.5
+  /** Specify that we want a label on the graduation on each X numbers, by default it's every 10 **/
   var labelEvery = 10
+  /** Specify that we want a  graduation on each X numbers, by default it's every 10 **/
   var graduationEvery = 10
+  /** Specify the order of display **/
   var descending = true
+
+  /** Get the data **/
   def data = matrix.data
 
+  /** Get the number of lines **/
   def lineLength = matrix.lineLength
+  /** Get the number of columns **/
   def columnLength = matrix.columnLength
 
+  /** Used to add a new elements to the chord
+    * we have to provice a new line, a new column, a boolean to know if we want to generate the chord now
+    * and the color to use
+    */
   def addElem(op: Op*) = {
     op.foreach( _ match {
       case lineOp(i) => {
@@ -36,6 +53,7 @@ object MyChordGraph extends DO {
 
   }
 
+  /** Used to get all the parameters of the chord a the construction **/
   def construct(op: Op*)  = {
     op.foreach( _ match {
       case widthOp(i) => {d3.select("svg").attr("width", i); d3.select("svg").attr("height", i)}
@@ -50,6 +68,7 @@ object MyChordGraph extends DO {
     })
   }
 
+  /** Generate the graph with the provided information **/
   def generate()  = {
     import js.JSConverters._
     var colorJS : js.Array[String] = colors.toJSArray
@@ -100,6 +119,7 @@ object MyChordGraph extends DO {
       .style("stroke", (d: Chord) => d3.rgb(color(d.target.index)).darker())
   }
 
+  /** Reset all the data provided but not the parameters**/
   def resetData() = {
     matrix.resetData()
     colors = new ArrayBuffer[String]()
